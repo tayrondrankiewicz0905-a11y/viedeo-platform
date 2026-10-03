@@ -472,3 +472,163 @@ footer strong {
     gap: 10px;
   }
 }
+
+.profile-wrap {
+  position: relative;
+}
+
+.profile-menu {
+  position: absolute;
+  top: 45px;
+  right: 0;
+  width: 230px;
+  padding: 14px;
+  border: 1px solid #292929;
+  border-radius: 8px;
+  background: rgba(15, 15, 15, 0.98);
+  box-shadow: 0 20px 50px rgba(0, 0, 0, 0.6);
+}
+
+.profile-title {
+  font-weight: 800;
+  margin-bottom: 5px;
+}
+
+.profile-email {
+  color: #777;
+  font-size: 12px;
+  margin-bottom: 12px;
+}
+
+.profile-menu button {
+  width: 100%;
+  padding: 10px;
+  margin-top: 5px;
+  border: 0;
+  border-radius: 5px;
+  background: #222;
+  color: white;
+  text-align: left;
+}
+
+.profile-menu button:hover {
+  background: #333;
+}
+
+.card-info {
+  cursor: pointer;
+}
+
+.modal-backdrop {
+  position: fixed;
+  z-index: 100;
+  inset: 0;
+  padding: 30px;
+  display: grid;
+  place-items: center;
+  background: rgba(0, 0, 0, 0.82);
+  backdrop-filter: blur(10px);
+}
+
+.player-modal,
+.info-modal {
+  position: relative;
+  width: min(1000px, 95vw);
+  max-height: 90vh;
+  overflow: auto;
+  border: 1px solid #292929;
+  border-radius: 10px;
+  background: #111;
+  box-shadow: 0 30px 100px rgba(0, 0, 0, 0.8);
+}
+
+.modal-close {
+  position: absolute;
+  z-index: 5;
+  top: 12px;
+  right: 12px;
+  width: 40px;
+  height: 40px;
+  border: 0;
+  border-radius: 50%;
+  display: grid;
+  place-items: center;
+  background: rgba(0, 0, 0, 0.75);
+  color: white;
+}
+
+.video-player-placeholder {
+  min-height: 500px;
+  padding: 50px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  background:
+    radial-gradient(circle at center, #242424 0%, #090909 65%);
+}
+
+.video-player-placeholder h2 {
+  margin: 20px 0 8px;
+}
+
+.video-player-placeholder p {
+  max-width: 520px;
+  color: #888;
+  line-height: 1.6;
+}
+
+.video-player-placeholder span {
+  margin-top: 10px;
+  color: #666;
+  font-size: 12px;
+}
+
+.player-details {
+  padding: 18px 22px;
+  display: flex;
+  justify-content: space-between;
+  gap: 20px;
+  color: #aaa;
+}
+
+.info-modal > img {
+  width: 100%;
+  max-height: 420px;
+  object-fit: cover;
+  display: block;
+}
+
+.info-modal-content {
+  padding: 30px;
+}
+
+.info-modal-content h2 {
+  font-size: 38px;
+  margin: 8px 0;
+}
+
+.info-modal-content p {
+  color: #aaa;
+  line-height: 1.6;
+}
+
+@media (max-width: 600px) {
+  .modal-backdrop {
+    padding: 10px;
+  }
+
+  .video-player-placeholder {
+    min-height: 350px;
+    padding: 25px;
+  }
+
+  .info-modal-content {
+    padding: 20px;
+  }
+
+  .info-modal-content h2 {
+    font-size: 28px;
+  }
+}

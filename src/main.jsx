@@ -76,6 +76,10 @@ function App() {
   const [menuOpen, setMenuOpen] = useState(false);
   const [myList, setMyList] = useState([]);
   const [activeCategory, setActiveCategory] = useState("Alle");
+  const [showProfile, setShowProfile] = useState(false);
+  const [showInfo, setShowInfo] = useState(null);
+  const [playingVideo, setPlayingVideo] = useState(null);
+  const [showMyList, setShowMyList] = useState(false);
 
   const categories = [
     "Alle",
@@ -90,12 +94,15 @@ function App() {
       const categoryMatch =
         activeCategory === "Alle" || video.category === activeCategory;
 
+      const myListMatch =
+        !showMyList || myList.includes(video.id);
+
       const searchMatch =
         !search ||
         video.title.toLowerCase().includes(search.toLowerCase()) ||
         video.description.toLowerCase().includes(search.toLowerCase());
 
-      return categoryMatch && searchMatch;
+      return categoryMatch && myListMatch && searchMatch;
     });
   }, [search, activeCategory]);
 
@@ -134,8 +141,10 @@ function App() {
             <button onClick={() => setActiveCategory("Natur")}>Natur</button>
             <button
               onClick={() => {
+                setShowMyList(true);
                 setSearch("");
                 setActiveCategory("Alle");
+                setMenuOpen(false);
               }}
             >
               Meine Liste
@@ -148,12 +157,19 @@ function App() {
             <Search size={19} />
             <input
               value={search}
-              onChange={(event) => setSearch(event.target.value)}
+              onChange={(event) => {
+                setSearch(event.target.value);
+                setShowMyList(false);
+              }}
               placeholder="Titel suchen..."
             />
           </div>
 
-          <button className="profile-button">
+          <button
+              className="profile-button"
+              onClick={() => setShowProfile(!showProfile)}
+              aria-label="Profil öffnen"
+            >
             <User size={20} />
             <ChevronDown size={16} />
           </button>
@@ -186,7 +202,11 @@ function App() {
             </div>
 
             <div className="hero-buttons">
-              <button className="play-button">
+              <button
+                className="play-button"
+                onClick={() => setPlayingVideo(featured)}
+                aria-label={`${featured.title} abspielen`}
+              >
                 <Play size={20} fill="currentColor" />
                 Abspielen
               </button>
@@ -203,7 +223,11 @@ function App() {
                 Meine Liste
               </button>
 
-              <button className="info-icon-button">
+              <button
+                className="info-icon-button"
+                onClick={() => setShowInfo(featured)}
+                aria-label="Informationen"
+              >
                 <Info size={20} />
               </button>
             </div>
@@ -218,7 +242,10 @@ function App() {
                 className={
                   activeCategory === category ? "category active" : "category"
                 }
-                onClick={() => setActiveCategory(category)}
+                onClick={() => {
+                  setActiveCategory(category);
+                  setShowMyList(false);
+                }}
               >
                 {category}
               </button>
@@ -249,7 +276,11 @@ function App() {
 
                       <span className="duration">{video.duration}</span>
 
-                      <button className="card-play">
+                      <button
+                        className="card-play"
+                        onClick={() => setPlayingVideo(video)}
+                        aria-label={`${video.title} abspielen`}
+                      >
                         <Play size={19} fill="currentColor" />
                       </button>
 
@@ -266,7 +297,15 @@ function App() {
                       </button>
                     </div>
 
-                    <div className="card-info">
+                    <div
+                      className="card-info"
+                      onClick={() => setShowInfo(video)}
+                      role="button"
+                      tabIndex="0"
+                      onKeyDown={(event) => {
+                        if (event.key === "Enter") setShowInfo(video);
+                      }}
+                    >
                       <h3>{video.title}</h3>
                       <p>{video.description}</p>
                     </div>
@@ -283,6 +322,102 @@ function App() {
           )}
         </section>
       </main>
+
+      {playingVideo && (
+        <div
+          className="modal-backdrop"
+          onClick={() => setPlayingVideo(null)}
+        >
+          <div
+            className="player-modal"
+            onClick={(event) => event.stopPropagation()}
+          >
+            <button
+              className="modal-close"
+              onClick={() => setPlayingVideo(null)}
+              aria-label="Player schließen"
+            >
+              <X size={22} />
+            </button>
+
+            <div className="video-player-placeholder">
+              <Play size={52} />
+              <h2>{playingVideo.title}</h2>
+              <p>
+                Der geschützte Videoplayer wird hier später mit dem
+                HLS-Stream verbunden.
+              </p>
+              <span>Keine öffentliche Download-Datei</span>
+            </div>
+
+            <div className="player-details">
+              <strong>{playingVideo.title}</strong>
+              <span>{playingVideo.duration}</span>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {showInfo && (
+        <div
+          className="modal-backdrop"
+          onClick={() => setShowInfo(null)}
+        >
+          <div
+            className="info-modal"
+            onClick={(event) => event.stopPropagation()}
+          >
+            <button
+              className="modal-close"
+              onClick={() => setShowInfo(null)}
+              aria-label="Informationen schließen"
+            >
+              <X size={22} />
+            </button>
+
+            <img src={showInfo.image} alt={showInfo.title} />
+
+            <div className="info-modal-content">
+              <div className="hero-label">{showInfo.category}</div>
+              <h2>{showInfo.title}</h2>
+              <p>{showInfo.description}</p>
+
+              <div className="hero-meta">
+                <span>2026</span>
+                <span>•</span>
+                <span>{showInfo.duration}</span>
+              </div>
+
+              <div className="hero-buttons">
+                <button
+                  className="play-button"
+                  onClick={() => {
+                    setPlayingVideo(showInfo);
+                    setShowInfo(null);
+                  }}
+                >
+                  <Play size={19} fill="currentColor" />
+                  Abspielen
+                </button>
+
+                <button
+                  className="info-button"
+                  onClick={() => toggleList(showInfo.id)}
+                >
+                  {myList.includes(showInfo.id) ? (
+                    <Check size={19} />
+                  ) : (
+                    <Plus size={19} />
+                  )}
+                  {myList.includes(showInfo.id)
+                    ? "Aus Liste entfernen"
+                    : "Meine Liste"}
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
 
       <footer>
         <strong>VIEDEO</strong>
