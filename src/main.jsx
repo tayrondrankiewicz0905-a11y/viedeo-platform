@@ -1,16 +1,13 @@
 import React, { useMemo, useState } from "react";
 import { createRoot } from "react-dom/client";
 import {
-  Search,
   Play,
   Plus,
-  Check,
+  Search,
   User,
-  Settings,
-  Shield,
-  LogOut,
-  ChevronRight,
-  Clock,
+  ChevronDown,
+  Info,
+  Check,
   Menu,
   X
 } from "lucide-react";
@@ -19,304 +16,279 @@ import "./style.css";
 const videos = [
   {
     id: 1,
-    title: "Willkommen bei Viedeo",
-    category: "Featured",
-    description:
-      "Deine private Video-Plattform. Videos ansehen, weiterschauen und deine persönliche Liste verwalten.",
-    duration: "1:24:32",
-    progress: 42,
+    title: "VIEDEO ORIGINAL",
+    category: "Empfohlen",
+    description: "Willkommen auf deiner privaten Video-Plattform.",
+    image:
+      "https://images.unsplash.com/photo-1489599849927-2ee91cede3ba?auto=format&fit=crop&w=1400&q=80",
+    duration: "1:24:18",
     featured: true
   },
   {
     id: 2,
-    title: "Sommer 2026",
-    category: "Momente",
-    description: "Besondere Momente und Erinnerungen.",
-    duration: "48:16",
-    progress: 12
+    title: "Night Drive",
+    category: "Filme",
+    description: "Eine nächtliche Reise durch die Stadt.",
+    image:
+      "https://images.unsplash.com/photo-1519608487953-e999c86e7455?auto=format&fit=crop&w=900&q=80",
+    duration: "48:21"
   },
   {
     id: 3,
-    title: "Deutschland Tour",
-    category: "Reisen",
-    description: "Eine Reise durch Deutschland.",
-    duration: "1:36:08",
-    progress: 0
+    title: "The Journey",
+    category: "Dokumentationen",
+    description: "Eine Reise voller neuer Eindrücke.",
+    image:
+      "https://images.unsplash.com/photo-1500534623283-312aade485b7?auto=format&fit=crop&w=900&q=80",
+    duration: "1:12:05"
   },
   {
     id: 4,
-    title: "Gaming Session",
-    category: "Gaming",
-    description: "Lange Gaming-Session mit Freunden.",
-    duration: "2:18:44",
-    progress: 67
+    title: "City Lights",
+    category: "Filme",
+    description: "Großstadt bei Nacht.",
+    image:
+      "https://images.unsplash.com/photo-1477959858617-67f85cf4f1df?auto=format&fit=crop&w=900&q=80",
+    duration: "36:44"
   },
   {
     id: 5,
-    title: "Best Moments",
-    category: "Momente",
-    description: "Die besten Clips gesammelt.",
-    duration: "35:51",
-    progress: 0
+    title: "Ocean",
+    category: "Natur",
+    description: "Die Schönheit des Meeres.",
+    image:
+      "https://images.unsplash.com/photo-1507525428034-b723cf961d3e?auto=format&fit=crop&w=900&q=80",
+    duration: "52:13"
   },
   {
     id: 6,
-    title: "Abenteuer",
-    category: "Reisen",
-    description: "Neue Orte und neue Erinnerungen.",
-    duration: "1:12:27",
-    progress: 24
+    title: "Mountain",
+    category: "Dokumentationen",
+    description: "Hoch hinaus.",
+    image:
+      "https://images.unsplash.com/photo-1464822759023-fed622ff2c3b?auto=format&fit=crop&w=900&q=80",
+    duration: "1:03:29"
   }
 ];
 
 function App() {
-  const [approved, setApproved] = useState(false);
-  const [admin, setAdmin] = useState(false);
   const [search, setSearch] = useState("");
+  const [menuOpen, setMenuOpen] = useState(false);
   const [myList, setMyList] = useState([]);
-  const [mobileMenu, setMobileMenu] = useState(false);
-  const [selected, setSelected] = useState(null);
+  const [activeCategory, setActiveCategory] = useState("Alle");
 
-  const filtered = useMemo(() => {
-    if (!search.trim()) return videos;
-    return videos.filter((v) =>
-      `${v.title} ${v.category} ${v.description}`
-        .toLowerCase()
-        .includes(search.toLowerCase())
-    );
-  }, [search]);
+  const categories = [
+    "Alle",
+    "Filme",
+    "Dokumentationen",
+    "Natur",
+    "Empfohlen"
+  ];
 
-  const toggleList = (id) => {
+  const filteredVideos = useMemo(() => {
+    return videos.filter((video) => {
+      const categoryMatch =
+        activeCategory === "Alle" || video.category === activeCategory;
+
+      const searchMatch =
+        !search ||
+        video.title.toLowerCase().includes(search.toLowerCase()) ||
+        video.description.toLowerCase().includes(search.toLowerCase());
+
+      return categoryMatch && searchMatch;
+    });
+  }, [search, activeCategory]);
+
+  function toggleList(id) {
     setMyList((current) =>
       current.includes(id)
         ? current.filter((item) => item !== id)
         : [...current, id]
     );
-  };
-
-  if (!approved) {
-    return (
-      <div className="auth-screen">
-        <div className="auth-card">
-          <div className="logo">VIEDEO</div>
-          <h1>Deine private Videoplattform</h1>
-          <p>
-            Melde dich mit deinem Google-Konto an. Neue Benutzer werden vor
-            dem Zugriff auf die Videos durch einen Administrator freigeschaltet.
-          </p>
-
-          <button className="google-button" onClick={() => setApproved(false)}>
-            <span className="google-icon">G</span>
-            Mit Google anmelden
-          </button>
-
-          <div className="demo-box">
-            <strong>Demo-Modus</strong>
-            <span>
-              In der späteren Version wird die Freigabe automatisch über das
-              Backend geprüft.
-            </span>
-            <button onClick={() => setApproved(true)}>
-              Demo-Benutzer genehmigen
-            </button>
-          </div>
-        </div>
-      </div>
-    );
   }
 
-  const featured = videos.find((v) => v.featured);
+  const featured = videos.find((video) => video.featured);
 
   return (
     <div className="app">
       <header className="navbar">
-        <div className="brand">VIEDEO</div>
+        <div className="nav-left">
+          <button
+            className="mobile-menu"
+            onClick={() => setMenuOpen(!menuOpen)}
+            aria-label="Menü"
+          >
+            {menuOpen ? <X /> : <Menu />}
+          </button>
 
-        <nav className={mobileMenu ? "nav-links open" : "nav-links"}>
-          <button>Startseite</button>
-          <button>Filme & Videos</button>
-          <button>Meine Liste</button>
-          {admin && <button onClick={() => alert("Admin-Bereich")}>Admin</button>}
-        </nav>
+          <div className="logo">VIEDEO</div>
 
-        <div className="nav-actions">
-          <div className="search">
-            <Search size={18} />
+          <nav className={menuOpen ? "nav-links open" : "nav-links"}>
+            <button onClick={() => setActiveCategory("Alle")}>Startseite</button>
+            <button onClick={() => setActiveCategory("Filme")}>Filme</button>
+            <button
+              onClick={() => setActiveCategory("Dokumentationen")}
+            >
+              Dokumentationen
+            </button>
+            <button onClick={() => setActiveCategory("Natur")}>Natur</button>
+            <button
+              onClick={() => {
+                setSearch("");
+                setActiveCategory("Alle");
+              }}
+            >
+              Meine Liste
+            </button>
+          </nav>
+        </div>
+
+        <div className="nav-right">
+          <div className="search-box">
+            <Search size={19} />
             <input
               value={search}
-              onChange={(e) => setSearch(e.target.value)}
-              placeholder="Suchen"
+              onChange={(event) => setSearch(event.target.value)}
+              placeholder="Titel suchen..."
             />
           </div>
 
-          <button className="icon-button">
+          <button className="profile-button">
             <User size={20} />
-          </button>
-
-          <button
-            className="icon-button mobile-toggle"
-            onClick={() => setMobileMenu(!mobileMenu)}
-          >
-            {mobileMenu ? <X size={20} /> : <Menu size={20} />}
+            <ChevronDown size={16} />
           </button>
         </div>
       </header>
 
       <main>
-        <section className="hero">
+        <section
+          className="hero"
+          style={{ backgroundImage: `url(${featured.image})` }}
+        >
+          <div className="hero-overlay" />
+
           <div className="hero-content">
-            <span className="eyebrow">VIEDEO ORIGINAL</span>
+            <div className="hero-label">VIEDEO ORIGINAL</div>
+
             <h1>{featured.title}</h1>
-            <p>{featured.description}</p>
+
+            <p>
+              {featured.description} Entdecke deine persönliche
+              Video-Sammlung auf VIEDEO.
+            </p>
 
             <div className="hero-meta">
               <span>2026</span>
               <span>•</span>
-              <span>HD</span>
+              <span>16+</span>
               <span>•</span>
               <span>{featured.duration}</span>
             </div>
 
             <div className="hero-buttons">
-              <button className="primary-button" onClick={() => setSelected(featured)}>
-                <Play size={19} fill="currentColor" />
+              <button className="play-button">
+                <Play size={20} fill="currentColor" />
                 Abspielen
               </button>
 
               <button
-                className="secondary-button"
+                className="info-button"
                 onClick={() => toggleList(featured.id)}
               >
                 {myList.includes(featured.id) ? (
-                  <Check size={19} />
+                  <Check size={20} />
                 ) : (
-                  <Plus size={19} />
+                  <Plus size={20} />
                 )}
                 Meine Liste
+              </button>
+
+              <button className="info-icon-button">
+                <Info size={20} />
               </button>
             </div>
           </div>
         </section>
 
         <section className="content">
-          <div className="section-heading">
-            <div>
-              <h2>Weiterschauen</h2>
-              <p>Setze deine Videos dort fort, wo du aufgehört hast.</p>
-            </div>
-            <ChevronRight />
-          </div>
-
-          <div className="video-grid">
-            {filtered.map((video) => (
-              <article className="video-card" key={video.id}>
-                <div
-                  className="thumbnail"
-                  onClick={() => setSelected(video)}
-                >
-                  <div className="thumbnail-gradient" />
-                  <div className="play-circle">
-                    <Play size={22} fill="currentColor" />
-                  </div>
-
-                  <span className="duration">{video.duration}</span>
-
-                  {video.progress > 0 && (
-                    <div className="progress">
-                      <div style={{ width: `${video.progress}%` }} />
-                    </div>
-                  )}
-                </div>
-
-                <div className="card-info">
-                  <span className="category">{video.category}</span>
-                  <h3>{video.title}</h3>
-                  <p>{video.description}</p>
-
-                  <div className="card-actions">
-                    <button onClick={() => setSelected(video)}>
-                      <Play size={16} />
-                      Abspielen
-                    </button>
-
-                    <button
-                      className="list-button"
-                      onClick={() => toggleList(video.id)}
-                    >
-                      {myList.includes(video.id) ? (
-                        <Check size={17} />
-                      ) : (
-                        <Plus size={17} />
-                      )}
-                    </button>
-                  </div>
-                </div>
-              </article>
+          <div className="category-bar">
+            {categories.map((category) => (
+              <button
+                key={category}
+                className={
+                  activeCategory === category ? "category active" : "category"
+                }
+                onClick={() => setActiveCategory(category)}
+              >
+                {category}
+              </button>
             ))}
           </div>
-        </section>
 
-        <section className="architecture">
           <div className="section-heading">
-            <div>
-              <h2>Plattform-Architektur</h2>
-              <p>Vorbereitet für die echte private Streaming-Infrastruktur.</p>
-            </div>
+            <h2>
+              {search
+                ? `Suchergebnisse für „${search}“`
+                : activeCategory === "Alle"
+                  ? "Für dich ausgewählt"
+                  : activeCategory}
+            </h2>
           </div>
 
-          <div className="architecture-grid">
-            <div>
-              <Shield />
-              <h3>Google Login</h3>
-              <p>Authentifizierung über Google OAuth.</p>
-            </div>
+          {filteredVideos.length > 0 ? (
+            <div className="video-grid">
+              {filteredVideos.map((video) => {
+                const saved = myList.includes(video.id);
 
-            <div>
-              <Clock />
-              <h3>HLS Streaming</h3>
-              <p>Auch mehrere Stunden lange Videos werden segmentiert gestreamt.</p>
-            </div>
+                return (
+                  <article className="video-card" key={video.id}>
+                    <div className="thumbnail">
+                      <img src={video.image} alt={video.title} />
 
-            <div>
-              <Settings />
-              <h3>Admin-System</h3>
-              <p>Benutzer, Videos, Kategorien und Freigaben zentral verwalten.</p>
+                      <div className="thumbnail-gradient" />
+
+                      <span className="duration">{video.duration}</span>
+
+                      <button className="card-play">
+                        <Play size={19} fill="currentColor" />
+                      </button>
+
+                      <button
+                        className="card-list"
+                        onClick={() => toggleList(video.id)}
+                        aria-label="Meine Liste"
+                      >
+                        {saved ? (
+                          <Check size={18} />
+                        ) : (
+                          <Plus size={18} />
+                        )}
+                      </button>
+                    </div>
+
+                    <div className="card-info">
+                      <h3>{video.title}</h3>
+                      <p>{video.description}</p>
+                    </div>
+                  </article>
+                );
+              })}
             </div>
-          </div>
+          ) : (
+            <div className="empty">
+              <Search size={40} />
+              <h3>Keine Videos gefunden</h3>
+              <p>Versuche einen anderen Suchbegriff.</p>
+            </div>
+          )}
         </section>
       </main>
 
       <footer>
-        <span>© 2026 Viedeo</span>
-        <button onClick={() => setAdmin(!admin)}>
-          {admin ? "Admin-Modus aktiv" : "Admin-Demo"}
-        </button>
-        <button onClick={() => setApproved(false)}>
-          <LogOut size={15} />
-          Abmelden
-        </button>
+        <strong>VIEDEO</strong>
+        <span>Private Video-Plattform</span>
+        <span>© 2026</span>
       </footer>
-
-      {selected && (
-        <div className="modal" onClick={() => setSelected(null)}>
-          <div className="player-modal" onClick={(e) => e.stopPropagation()}>
-            <button className="close" onClick={() => setSelected(null)}>
-              <X />
-            </button>
-
-            <div className="fake-player">
-              <Play size={52} fill="currentColor" />
-              <span>Geschützter HLS-Player</span>
-            </div>
-
-            <div className="player-info">
-              <span className="category">{selected.category}</span>
-              <h2>{selected.title}</h2>
-              <p>{selected.description}</p>
-            </div>
-          </div>
-        </div>
-      )}
     </div>
   );
 }
